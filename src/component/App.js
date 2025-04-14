@@ -161,7 +161,10 @@ export const  App =() =>{
 
  const handleClick = buttonName => {
     const newState=calc(state, buttonName)
-    setState(newState);
+    setState(prev => ({
+      ...prev,
+      ...newState
+    }));
   };
 
     return (
