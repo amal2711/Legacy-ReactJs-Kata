@@ -1,21 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 import Big from "big.js";
 import "./App.css";
-import Button from "./Button";
+import {Button} from "./Button";
 
-export default class App extends React.Component {
-  state = {
-    total: null,
+export const  App =() =>{
+
+  const  [state, setState] = useState({ total: null,
     next: null,
-    operation: null,
-  };
-
-   isNumber=(item)=> {
+    operation: null,})
+ 
+   const isNumber=(item)=> {
     return /[0-9]+/.test(item);
   }
 
 
-   operate=(numberOne, numberTwo, operation)=> {
+   const operate=(numberOne, numberTwo, operation)=> {
     const one = Big(numberOne || "0");
     const two = Big(numberTwo || (operation === "÷" || operation === 'x' ? "1": "0")); //If dividing or multiplying, then 1 maintains current value in cases of null
     if (operation === "+") {
@@ -39,7 +38,7 @@ export default class App extends React.Component {
   }
   
 
-  calc = (obj, buttonName) => {
+  const calc = (obj, buttonName) => {
     if (buttonName === "AC") {
       return {
         total: null,
@@ -48,7 +47,7 @@ export default class App extends React.Component {
       };
     }
 
-    if (this.isNumber(buttonName)) {
+    if (isNumber(buttonName)) {
       if (buttonName === "0" && obj.next === "0") {
         return {};
       }
@@ -75,7 +74,7 @@ export default class App extends React.Component {
 
     if (buttonName === "%") {
       if (obj.operation && obj.next) {
-        const result =this.operate(obj.total, obj.next, obj.operation);
+        const result =operate(obj.total, obj.next, obj.operation);
         return {
           total: Big(result)
             .div(Big("100"))
@@ -108,7 +107,7 @@ export default class App extends React.Component {
     if (buttonName === "=") {
       if (obj.next && obj.operation) {
         return {
-          total: this.operate(obj.total, obj.next, obj.operation),
+          total: operate(obj.total, obj.next, obj.operation),
           next: null,
           operation: null,
         };
@@ -139,7 +138,7 @@ export default class App extends React.Component {
     // User pressed an operation button and there is an existing operation
     if (obj.operation) {
       return {
-        total: this.operate(obj.total, obj.next, obj.operation),
+        total: operate(obj.total, obj.next, obj.operation),
         next: null,
         operation: buttonName,
       };
@@ -160,48 +159,48 @@ export default class App extends React.Component {
     };
   };
 
-  handleClick = buttonName => {
-    this.setState(this.calc(this.state, buttonName));
+ const handleClick = buttonName => {
+    const newState=calc(state, buttonName)
+    setState(newState);
   };
 
-  render() {
     return (
       <div className="component-app">
         <div className="component-display">
-          <div>{this.state.next || this.state.total || "0"} </div>
+          <div>{state.next || state.total || "0"} </div>
         </div>
         <div className="component-button-panel">
           <div>
-            <Button name="AC" clickHandler={this.handleClick} />
-            <Button name="+/-" clickHandler={this.handleClick} />
-            <Button name="%" clickHandler={this.handleClick} />
-            <Button name="÷" clickHandler={this.handleClick} orange />
+            <Button name="AC" clickHandler={handleClick} />
+            <Button name="+/-" clickHandler={handleClick} />
+            <Button name="%" clickHandler={handleClick} />
+            <Button name="÷" clickHandler={handleClick} orange />
           </div>
           <div>
-            <Button name="7" clickHandler={this.handleClick} />
-            <Button name="8" clickHandler={this.handleClick} />
-            <Button name="9" clickHandler={this.handleClick} />
-            <Button name="x" clickHandler={this.handleClick} orange />
+            <Button name="7" clickHandler={handleClick} />
+            <Button name="8" clickHandler={handleClick} />
+            <Button name="9" clickHandler={handleClick} />
+            <Button name="x" clickHandler={handleClick} orange />
           </div>
           <div>
-            <Button name="4" clickHandler={this.handleClick} />
-            <Button name="5" clickHandler={this.handleClick} />
-            <Button name="6" clickHandler={this.handleClick} />
-            <Button name="-" clickHandler={this.handleClick} orange />
+            <Button name="4" clickHandler={handleClick} />
+            <Button name="5" clickHandler={handleClick} />
+            <Button name="6" clickHandler={handleClick} />
+            <Button name="-" clickHandler={handleClick} orange />
           </div>
           <div>
-            <Button name="1" clickHandler={this.handleClick} />
-            <Button name="2" clickHandler={this.handleClick} />
-            <Button name="3" clickHandler={this.handleClick} />
-            <Button name="+" clickHandler={this.handleClick} orange />
+            <Button name="1" clickHandler={handleClick} />
+            <Button name="2" clickHandler={handleClick} />
+            <Button name="3" clickHandler={handleClick} />
+            <Button name="+" clickHandler={handleClick} orange />
           </div>
           <div>
-            <Button name="0" clickHandler={this.handleClick} wide />
-            <Button name="." clickHandler={this.handleClick} />
-            <Button name="=" clickHandler={this.handleClick} orange />
+            <Button name="0" clickHandler={handleClick} wide />
+            <Button name="." clickHandler={handleClick} />
+            <Button name="=" clickHandler={handleClick} orange />
           </div>
         </div>{" "}
       </div>
     );
-  }
+  
 }
