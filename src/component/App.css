@@ -1,0 +1,35 @@
+.component-app {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 100%;
+}
+
+.component-button-panel {
+  background-color: #858694;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  flex: 1 0 auto;
+}
+
+.component-button-panel > div {
+  width: 100%;
+  margin-bottom: 1px;
+  flex: 1 0 auto;
+  display: flex;
+}
+.component-display {
+  background-color: #858694;
+  color: white;
+  text-align: right;
+  font-weight: 200;
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+.component-display > div {
+  font-size: 2.5rem;
+  padding: 0.2rem 0.7rem 0.1rem 0.5rem;
+}
+
