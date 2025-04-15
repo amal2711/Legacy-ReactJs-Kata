@@ -12,9 +12,9 @@
   background-color: #e0e0e0;
   border: 0;
   font-size: 1.5rem;
-  margin: 0 1px 0 0;
+  margin: 0 1px 1px 0;
   flex: 1 0 auto;
-  padding: 0;
+  padding: 30px;
 }
 
 .component-button:last-child button {

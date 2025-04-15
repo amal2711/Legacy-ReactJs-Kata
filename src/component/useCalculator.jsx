@@ -1,44 +1,16 @@
 import Big from "big.js";
 import { useState } from "react";
+import { operate } from "./utitlity";
 
 export const useCalculator = () => {
-  const [state, setState] = useState({
+  const [calculatorState, setCalculatorState] = useState({
     total: null,
     next: null,
     operation: null,
   });
 
-  const isNumber = (item) => {
-    return /[0-9]+/.test(item);
-  };
-
-  const operate = (numberOne, numberTwo, operation) => {
-    const one = Big(numberOne || "0");
-    const two = Big(
-      numberTwo || (operation === "÷" || operation === "x" ? "1" : "0")
-    ); //If dividing or multiplying, then 1 maintains current value in cases of null
-    if (operation === "+") {
-      return one.plus(two).toString();
-    }
-    if (operation === "-") {
-      return one.minus(two).toString();
-    }
-    if (operation === "x") {
-      return one.times(two).toString();
-    }
-    if (operation === "÷") {
-      if (two === "0") {
-        alert("Divide by 0 error");
-        return "0";
-      } else {
-        return one.div(two).toString();
-      }
-    }
-    throw Error(`Unknown operation '${operation}'`);
-  };
-
-  const updateState = (newState) => {
-    setState((prev) => ({
+  const updateState = newState => {
+    setCalculatorState(prev => ({
       ...prev,
       ...newState,
     }));
@@ -52,18 +24,16 @@ export const useCalculator = () => {
     });
   };
 
-  const handleOperationUpdate = (inputValue) => {
+  const handleOperationUpdate = inputValue => {
     updateState(
-      state.next
-        ? { next: state.next + inputValue }
-        : { next: inputValue }
+      calculatorState.next ? { next: calculatorState.next + inputValue } : { next: inputValue },
     );
   };
 
-  const handleNextValueUpdate = (inputValue) => {
-    const nextValue = state.next === "0" ? inputValue : state.next + inputValue;
+  const handleNextValueUpdate = inputValue => {
+    const nextValue = calculatorState.next === "0" ? inputValue : calculatorState.next + inputValue;
     updateState(
-      state.next
+      calculatorState.next
         ? {
             next: nextValue,
             total: null,
@@ -71,115 +41,175 @@ export const useCalculator = () => {
         : {
             next: inputValue,
             total: null,
-          }
+          },
     );
   };
 
-  const handleNumberInput = (inputValue) => {
+  const handleNumberInput = inputValue => {
     const isZeroEnteredForValueAndOperation =
-      inputValue === "0" && state.next === "0";
+      inputValue === "0" && calculatorState.next === "0";
     if (isZeroEnteredForValueAndOperation) return;
 
-    state.operation
+    calculatorState.operation
       ? handleOperationUpdate(inputValue)
       : handleNextValueUpdate(inputValue);
   };
 
   const returnPercentageResult = () => {
-    const result = operate(state.total, state.next, state.operation);
+    const result = operate(calculatorState.total, calculatorState.next, calculatorState.operation);
     updateState({
-      total: Big(result).div(Big("100")).toString(),
+      total: Big(result)
+        .div(Big("100"))
+        .toString(),
       next: null,
       operation: null,
     });
   };
 
   const handlePercentageInput = () => {
-    if (state.operation && state.next) {
+    if (calculatorState.operation && calculatorState.next) {
       returnPercentageResult();
     } else {
       updateState(
-        state.next
+        calculatorState.next
           ? {
-              next: Big(state.next).div(Big("100")).toString(),
+              next: Big(calculatorState.next)
+                .div(Big("100"))
+                .toString(),
             }
-          : {}
+          : {},
       );
     }
   };
 
   const handleDotInput = () => {
-    if (state.next) {
-      if (state.next.includes(".")) {
-        return;
-      }
-      updateState({ next: state.next + "." });
+    if (calculatorState.next) {
+      if (calculatorState.next.includes(".")) {return;}
+      updateState({ next: calculatorState.next + "." });
     } else {
       updateState({ next: "0." });
     }
   };
 
   const handleAdditiveInput = () => {
-    if (state.next) {
-      updateState({ next: (-1 * parseFloat(state.next)).toString() });
-    } else if (state.total) {
-      updateState({ total: (-1 * parseFloat(state.total)).toString() });
+    if (calculatorState.next) {
+      updateState({ next: (-1 * parseFloat(calculatorState.next)).toString() });
+    } else if (calculatorState.total) {
+      updateState({ total: (-1 * parseFloat(calculatorState.total)).toString() });
     } else {
-      updateState({});
-    }
+return    }
   };
 
   const handleEqualsInput = () => {
-    if (state.next && state.operation) {
+    if (calculatorState.next && calculatorState.operation) {
       updateState({
-        total: operate(state.total, state.next, state.operation),
+        total: operate(calculatorState.total, calculatorState.next, calculatorState.operation),
         next: null,
         operation: null,
       });
     } else {
-      updateState({});
+    return  
     }
   };
 
-  const handleOperationInput = (state, inputValue) => {
-    if (state.operation) {
+  const handleOperationInput = (inputValue) => {
+    if (calculatorState.operation) {
       updateState({
-        total: operate(state.total, state.next, state.operation),
+        total: operate(calculatorState.total, calculatorState.next, calculatorState.operation),
         next: null,
         operation: inputValue,
       });
-    } else if (!state.next) {
+    } else if (!calculatorState.next) {
       updateState({ operation: inputValue });
     } else {
       updateState({
-        total: state.next,
+        total: calculatorState.next,
         next: null,
         operation: inputValue,
       });
     }
   };
 
-  const calc = (state, inputValue) => {
-    if (inputValue === "AC") {
-      resetValues();
-    } else if (isNumber(inputValue)) {
-      handleNumberInput(inputValue);
-    } else if (inputValue === "%") {
-      handlePercentageInput();
-    } else if (inputValue === ".") {
-      handleDotInput();
-    } else if (inputValue === "=") {
-      handleEqualsInput();
-    } else if (inputValue === "+/-") {
-      handleAdditiveInput();
-    } else {
-      handleOperationInput(state, inputValue);
-    }
-  };
-
-  const handleClick = (buttonName) => {
-    calc(state, buttonName);
-  };
-
-  return { handleClick, state };
+  const buttons = [
+    { inputValue: "AC", handleClick:()=> resetValues() },
+    {
+      inputValue: "+/-",
+      handleClick: ()=>handleAdditiveInput(),
+    },
+    {
+      inputValue: "%",
+      handleClick: ()=>handlePercentageInput(),
+    },
+    {
+      inputValue: "÷",
+      handleClick: () => handleOperationInput("÷"),
+      orange: true,
+    },
+    {
+      inputValue: "7",
+      handleClick: () => handleNumberInput("7"),
+    },
+    {
+      inputValue: "8",
+      handleClick: () => handleNumberInput("8"),
+    },
+    {
+      inputValue: "9",
+      handleClick: () => handleNumberInput("9"),
+    },
+    {
+      inputValue: "x",
+      handleClick: () => handleOperationInput( "x"),
+      orange: true,
+    },
+    {
+      inputValue: "4",
+      handleClick: () => handleNumberInput("4"),
+    },
+    {
+      inputValue: "5",
+      handleClick: () => handleNumberInput("5"),
+    },
+    {
+      inputValue: "6",
+      handleClick: () => handleNumberInput("6"),
+    },
+    {
+      inputValue: "-",
+      handleClick: () => handleOperationInput( "-"),
+      orange: true,
+    },
+    {
+      inputValue: "1",
+      handleClick: () => handleNumberInput("1"),
+    },
+    {
+      inputValue: "2",
+      handleClick: () => handleNumberInput("2"),
+    },
+    {
+      inputValue: "3",
+      handleClick: () => handleNumberInput("3"),
+    },
+    {
+      inputValue: "+",
+      handleClick: () => handleOperationInput("+"),
+      orange: true,
+    },
+    {
+      inputValue: "0",
+      handleClick: () => handleNumberInput("0"),
+      wide: true,
+    },
+    {
+      inputValue: ".",
+      handleClick: () => handleDotInput(),
+    },
+    {
+      inputValue: "=",
+      handleClick: () => handleEqualsInput(),
+      orange: true,
+    },
+  ];
+  return { calculatorState, buttons };
 };
