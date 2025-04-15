@@ -1,7 +1,7 @@
 import React from "react";
 import "./Button.css";
 
-export const Button =({name, orange, wide, clickHandler}) =>{
+export const Button =({name, orange, wide, clickHandler, testId}) =>{
 
     const className = [
       "component-button",
@@ -10,8 +10,8 @@ export const Button =({name, orange, wide, clickHandler}) =>{
     ];
 
     return (
-      <div className={className.join(" ").trim()}>
-        <button onClick={clickHandler}>{name}</button>
+      <div className={className.join(" ").trim()} >
+        <button data-testid={testId} onClick={clickHandler}>{name}</button>
       </div>
     );
   

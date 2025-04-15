@@ -4,6 +4,9 @@
   "license": "MIT",
   "homepage": "http://ahfarmer.github.io/calculator",
   "devDependencies": {
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
     "chai": "^4.2.0",
     "gh-pages": "^2.0.1",
     "prettier": "^1.17.1",
@@ -12,8 +15,8 @@
   "dependencies": {
     "big.js": "^5.2.2",
     "github-fork-ribbon-css": "^0.2.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "scripts": {
     "start": "react-scripts start",

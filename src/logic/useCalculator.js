@@ -32,7 +32,7 @@ export const useCalculator = () => {
     );
   };
 
-  const handleNextValueUpdate = inputValue => {
+  const handleNextValueUpdate = (inputValue) => {
     const nextValue =
       calculatorState.next === "0"
         ? inputValue
@@ -105,7 +105,7 @@ export const useCalculator = () => {
     }
   }, [calculatorState.next]);
 
-  const handleAdditiveInput = useCallback(() => {
+  const handleNegation = useCallback(() => {
     if (calculatorState.next) {
       updateState({ next: (-1 * parseFloat(calculatorState.next)).toString() });
     } else if (calculatorState.total) {
@@ -159,84 +159,103 @@ export const useCalculator = () => {
   );
 
   const buttons = [
-    { inputValue: "AC", handleClick: () => resetValues() },
+    { inputValue: "AC", handleClick: () => resetValues() , testId: "Calculator_AC" },
     {
       inputValue: "+/-",
-      handleClick: () => handleAdditiveInput(),
+      handleClick: () => handleNegation(),
+      testId: "Calculator_ Negation",
     },
     {
       inputValue: "%",
       handleClick: () => handlePercentageInput(),
+      testId: "Calculator_Percentage",
     },
     {
       inputValue: "÷",
       handleClick: () => handleOperationInput("÷"),
       orange: true,
+      testId: "Calculator_Division",
     },
     {
       inputValue: "7",
       handleClick: () => handleNumberInput("7"),
+      testId: "Calculator_7",
     },
     {
       inputValue: "8",
       handleClick: () => handleNumberInput("8"),
+      testId: "Calculator_8",
     },
     {
       inputValue: "9",
       handleClick: () => handleNumberInput("9"),
+      testId: "Calculator_9",
     },
     {
       inputValue: "x",
       handleClick: () => handleOperationInput("x"),
-      orange: true,
+      orange: true, 
+      testId: "Calculator_Multiplication",
+
     },
     {
       inputValue: "4",
       handleClick: () => handleNumberInput("4"),
+      testId: "Calculator_4",
     },
     {
       inputValue: "5",
       handleClick: () => handleNumberInput("5"),
+      testId: "Calculator_5",
     },
     {
       inputValue: "6",
       handleClick: () => handleNumberInput("6"),
+      testId: "Calculator_6",
     },
     {
       inputValue: "-",
       handleClick: () => handleOperationInput("-"),
       orange: true,
+      testId: "Calculator_Subtraction",
     },
     {
       inputValue: "1",
       handleClick: () => handleNumberInput("1"),
+      testId: "Calculator_1",
     },
     {
       inputValue: "2",
       handleClick: () => handleNumberInput("2"),
+      testId: "Calculator_2",
     },
     {
       inputValue: "3",
       handleClick: () => handleNumberInput("3"),
+      testId: "Calculator_3",
     },
     {
       inputValue: "+",
       handleClick: () => handleOperationInput("+"),
       orange: true,
+      testId: "Calculator_Addition",
     },
     {
       inputValue: "0",
       handleClick: () => handleNumberInput("0"),
       wide: true,
+      testId: "Calculator_0",
     },
     {
       inputValue: ".",
       handleClick: () => handleDotInput(),
+      testId: "Calculator_Dot",
     },
     {
       inputValue: "=",
       handleClick: () => handleEqualsInput(),
       orange: true,
+      testId: "Calculator_Equals",
     },
   ];
   return { calculatorState, buttons };
