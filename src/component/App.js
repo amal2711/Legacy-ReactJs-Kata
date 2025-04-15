@@ -6,8 +6,6 @@ import { useCalculator } from "./useCalculator";
 export const  App =() =>{
 
   const{handleClick, state}= useCalculator()
-  console.log(state)
-
 
     return (
       <div className="component-app">

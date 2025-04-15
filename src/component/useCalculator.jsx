@@ -74,7 +74,7 @@ export const useCalculator = () => {
       : handleNextValueUpdate(inputValue);
   };
 
-  const returnModuloResult = () => {
+  const returnPercentageResult = () => {
     const result = operate(state.total, state.next, state.operation);
     return {
       total: Big(result).div(Big("100")).toString(),
@@ -83,10 +83,10 @@ export const useCalculator = () => {
     };
   };
 
-  const handleModuloOperation = () => {
+  const handlePercentageInput = () => {
     state.operation &&
       state.next &&
-      returnModuloResult();
+      returnPercentageResult();
     return state.next
       ? {
           next: Big(state.next).div(Big("100")).toString(),
@@ -128,53 +128,9 @@ export const useCalculator = () => {
   };
 
 
-  const calc = (state, inputValue) => {
-  
-    if (inputValue === "AC") {
-     return resetValues()
-    }
+  const handleOperationInput = (state, inputValue) => {
 
-    if (isNumber(inputValue)) {
-      return handleNumberInput(inputValue);
-    }
-
-    if (inputValue === "%") {
-      return handleModuloOperation();
-    }
-
-    if (inputValue === ".") {
-      return handleDotInput();
-    }
-    if (inputValue === "=") {
-      return handleEqualsInput();
-    }
-    if (inputValue === "+/-") {
-      return handleAdditiveInput();
-    }
-    // User pressed an operation button and there is an existing operation
-    if (state.operation) {
-      return {
-        total: operate(state.total, state.next, state.operation),
-        next: null,
-        operation: inputValue,
-      };
-    }         
-
-    
-
-   
-
-  
-
-    // Button must be an operation
-
-    // When the user presses an operation button without having entered
-    // a number first, do nothing.
-    // if (!obj.next && !obj.total) {
-    //   return {};
-    // }
-
-    // User pressed an operation button and there is an existing operation
+    // User pressed an operation button and there is an existing operation overwrite operation
     if (state.operation) {
       return {
         total: operate(state.total, state.next, state.operation),
@@ -196,6 +152,34 @@ export const useCalculator = () => {
       next: null,
       operation: inputValue,
     };
+  }
+
+  const calc = (state, inputValue) => {
+  
+    if (inputValue === "AC") {
+     return resetValues()
+    }
+
+    if (isNumber(inputValue)) {
+      return handleNumberInput(inputValue);
+    }
+
+    if (inputValue === "%") {
+      return handlePercentageInput();
+    }
+
+    if (inputValue === ".") {
+      return handleDotInput();
+    }
+    if (inputValue === "=") {
+      return handleEqualsInput();
+    }
+    if (inputValue === "+/-") {
+      return handleAdditiveInput();
+    }
+
+    return handleOperationInput(state, inputValue);
+    
   };
 
 
