@@ -37,158 +37,148 @@ export const useCalculator = () => {
     throw Error(`Unknown operation '${operation}'`);
   };
 
+  const updateState = (newState) => {
+    setState((prev) => ({
+      ...prev,
+      ...newState,
+    }));
+  };
+
   const resetValues = () => {
-    return {
+    updateState({
       total: null,
       next: null,
       operation: null,
-    }
-  }
-    
+    });
+  };
 
-
-  const handleOperationUpdate = (inputValue) =>
-    state.next ? { next: state.next + inputValue } : { next: inputValue };
+  const handleOperationUpdate = (inputValue) => {
+    updateState(
+      state.next
+        ? { next: state.next + inputValue }
+        : { next: inputValue }
+    );
+  };
 
   const handleNextValueUpdate = (inputValue) => {
-    const nextValue =
-      state.next === "0" ? inputValue : state.next + inputValue;
-    return state.next
-      ? {
-          next: nextValue,
-          total: null,
-        }
-      : {
-          next: inputValue,
-          total: null,
-        };
+    const nextValue = state.next === "0" ? inputValue : state.next + inputValue;
+    updateState(
+      state.next
+        ? {
+            next: nextValue,
+            total: null,
+          }
+        : {
+            next: inputValue,
+            total: null,
+          }
+    );
   };
 
   const handleNumberInput = (inputValue) => {
     const isZeroEnteredForValueAndOperation =
       inputValue === "0" && state.next === "0";
-    if (isZeroEnteredForValueAndOperation) return {};
+    if (isZeroEnteredForValueAndOperation) return;
 
-    return state.operation
+    state.operation
       ? handleOperationUpdate(inputValue)
       : handleNextValueUpdate(inputValue);
   };
 
   const returnPercentageResult = () => {
     const result = operate(state.total, state.next, state.operation);
-    return {
+    updateState({
       total: Big(result).div(Big("100")).toString(),
       next: null,
       operation: null,
-    };
+    });
   };
 
   const handlePercentageInput = () => {
-    state.operation &&
-      state.next &&
+    if (state.operation && state.next) {
       returnPercentageResult();
-    return state.next
-      ? {
-          next: Big(state.next).div(Big("100")).toString(),
-        }
-      : {};
+    } else {
+      updateState(
+        state.next
+          ? {
+              next: Big(state.next).div(Big("100")).toString(),
+            }
+          : {}
+      );
+    }
   };
 
   const handleDotInput = () => {
     if (state.next) {
-      // ignore a . if the next number already has one
       if (state.next.includes(".")) {
-        return {};
+        return;
       }
-      return { next: state.next + "." };
+      updateState({ next: state.next + "." });
+    } else {
+      updateState({ next: "0." });
     }
-    return { next: "0." };
   };
 
   const handleAdditiveInput = () => {
     if (state.next) {
-      return { next: (-1 * parseFloat(state.next)).toString() };
+      updateState({ next: (-1 * parseFloat(state.next)).toString() });
+    } else if (state.total) {
+      updateState({ total: (-1 * parseFloat(state.total)).toString() });
+    } else {
+      updateState({});
     }
-    if (state.total) {
-      return { total: (-1 * parseFloat(state.total)).toString() };
-    }
-    return {};
   };
 
   const handleEqualsInput = () => {
     if (state.next && state.operation) {
-      return {
+      updateState({
         total: operate(state.total, state.next, state.operation),
         next: null,
         operation: null,
-      };
+      });
     } else {
-      return {};
+      updateState({});
     }
   };
 
-
   const handleOperationInput = (state, inputValue) => {
-
-    // User pressed an operation button and there is an existing operation overwrite operation
     if (state.operation) {
-      return {
+      updateState({
         total: operate(state.total, state.next, state.operation),
         next: null,
         operation: inputValue,
-      };
+      });
+    } else if (!state.next) {
+      updateState({ operation: inputValue });
+    } else {
+      updateState({
+        total: state.next,
+        next: null,
+        operation: inputValue,
+      });
     }
-
-    // no operation yet, but the user typed one
-
-    // The user hasn't typed a number yet, just save the operation
-    if (!state.next) {
-      return { operation: inputValue };
-    }
-
-    // save the operation and shift 'next' into 'total'
-    return {
-      total: state.next,
-      next: null,
-      operation: inputValue,
-    };
-  }
-
-  const calc = (state, inputValue) => {
-  
-    if (inputValue === "AC") {
-     return resetValues()
-    }
-
-    if (isNumber(inputValue)) {
-      return handleNumberInput(inputValue);
-    }
-
-    if (inputValue === "%") {
-      return handlePercentageInput();
-    }
-
-    if (inputValue === ".") {
-      return handleDotInput();
-    }
-    if (inputValue === "=") {
-      return handleEqualsInput();
-    }
-    if (inputValue === "+/-") {
-      return handleAdditiveInput();
-    }
-
-    return handleOperationInput(state, inputValue);
-    
   };
 
+  const calc = (state, inputValue) => {
+    if (inputValue === "AC") {
+      resetValues();
+    } else if (isNumber(inputValue)) {
+      handleNumberInput(inputValue);
+    } else if (inputValue === "%") {
+      handlePercentageInput();
+    } else if (inputValue === ".") {
+      handleDotInput();
+    } else if (inputValue === "=") {
+      handleEqualsInput();
+    } else if (inputValue === "+/-") {
+      handleAdditiveInput();
+    } else {
+      handleOperationInput(state, inputValue);
+    }
+  };
 
   const handleClick = (buttonName) => {
-    const newState = calc(state,buttonName);
-    setState((prev) => ({
-      ...prev,
-      ...newState,
-    }));
+    calc(state, buttonName);
   };
 
   return { handleClick, state };
