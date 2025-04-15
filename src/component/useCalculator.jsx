@@ -1,5 +1,5 @@
 import Big from "big.js";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { operate } from "./utitlity";
 
 export const useCalculator = () => {
@@ -26,12 +26,17 @@ export const useCalculator = () => {
 
   const handleOperationUpdate = inputValue => {
     updateState(
-      calculatorState.next ? { next: calculatorState.next + inputValue } : { next: inputValue },
+      calculatorState.next
+        ? { next: calculatorState.next + inputValue }
+        : { next: inputValue },
     );
   };
 
   const handleNextValueUpdate = inputValue => {
-    const nextValue = calculatorState.next === "0" ? inputValue : calculatorState.next + inputValue;
+    const nextValue =
+      calculatorState.next === "0"
+        ? inputValue
+        : calculatorState.next + inputValue;
     updateState(
       calculatorState.next
         ? {
@@ -45,18 +50,25 @@ export const useCalculator = () => {
     );
   };
 
-  const handleNumberInput = inputValue => {
-    const isZeroEnteredForValueAndOperation =
-      inputValue === "0" && calculatorState.next === "0";
-    if (isZeroEnteredForValueAndOperation) return;
+  const handleNumberInput = useCallback(
+    inputValue => {
+      const isZeroEnteredForValueAndOperation =
+        inputValue === "0" && calculatorState.next === "0";
+      if (isZeroEnteredForValueAndOperation) return;
 
-    calculatorState.operation
-      ? handleOperationUpdate(inputValue)
-      : handleNextValueUpdate(inputValue);
-  };
+      calculatorState.operation
+        ? handleOperationUpdate(inputValue)
+        : handleNextValueUpdate(inputValue);
+    },
+    [calculatorState]
+  );
 
   const returnPercentageResult = () => {
-    const result = operate(calculatorState.total, calculatorState.next, calculatorState.operation);
+    const result = operate(
+      calculatorState.total,
+      calculatorState.next,
+      calculatorState.operation,
+    );
     updateState({
       total: Big(result)
         .div(Big("100"))
@@ -66,7 +78,7 @@ export const useCalculator = () => {
     });
   };
 
-  const handlePercentageInput = () => {
+  const handlePercentageInput = useCallback(() => {
     if (calculatorState.operation && calculatorState.next) {
       returnPercentageResult();
     } else {
@@ -80,65 +92,81 @@ export const useCalculator = () => {
           : {},
       );
     }
-  };
+  }, [calculatorState.next, calculatorState.operation]);
 
-  const handleDotInput = () => {
+  const handleDotInput = useCallback(() => {
     if (calculatorState.next) {
-      if (calculatorState.next.includes(".")) {return;}
+      if (calculatorState.next.includes(".")) {
+        return;
+      }
       updateState({ next: calculatorState.next + "." });
     } else {
       updateState({ next: "0." });
     }
-  };
+  }, [calculatorState.next]);
 
-  const handleAdditiveInput = () => {
+  const handleAdditiveInput = useCallback(() => {
     if (calculatorState.next) {
       updateState({ next: (-1 * parseFloat(calculatorState.next)).toString() });
     } else if (calculatorState.total) {
-      updateState({ total: (-1 * parseFloat(calculatorState.total)).toString() });
+      updateState({
+        total: (-1 * parseFloat(calculatorState.total)).toString(),
+      });
     } else {
-return    }
-  };
+      return;
+    }
+  }, [calculatorState.next, calculatorState.total]);
 
-  const handleEqualsInput = () => {
+  const handleEqualsInput = useCallback(() => {
     if (calculatorState.next && calculatorState.operation) {
       updateState({
-        total: operate(calculatorState.total, calculatorState.next, calculatorState.operation),
+        total: operate(
+          calculatorState.total,
+          calculatorState.next,
+          calculatorState.operation,
+        ),
         next: null,
         operation: null,
       });
     } else {
-    return  
+      return;
     }
-  };
+  }, [calculatorState]);
 
-  const handleOperationInput = (inputValue) => {
-    if (calculatorState.operation) {
-      updateState({
-        total: operate(calculatorState.total, calculatorState.next, calculatorState.operation),
-        next: null,
-        operation: inputValue,
-      });
-    } else if (!calculatorState.next) {
-      updateState({ operation: inputValue });
-    } else {
-      updateState({
-        total: calculatorState.next,
-        next: null,
-        operation: inputValue,
-      });
-    }
-  };
+  const handleOperationInput = useCallback(
+    inputValue => {
+      if (calculatorState.operation) {
+        updateState({
+          total: operate(
+            calculatorState.total,
+            calculatorState.next,
+            calculatorState.operation,
+          ),
+          next: null,
+          operation: inputValue,
+        });
+      } else if (!calculatorState.next) {
+        updateState({ operation: inputValue });
+      } else {
+        updateState({
+          total: calculatorState.next,
+          next: null,
+          operation: inputValue,
+        });
+      }
+    },
+    [calculatorState],
+  );
 
   const buttons = [
-    { inputValue: "AC", handleClick:()=> resetValues() },
+    { inputValue: "AC", handleClick: () => resetValues() },
     {
       inputValue: "+/-",
-      handleClick: ()=>handleAdditiveInput(),
+      handleClick: () => handleAdditiveInput(),
     },
     {
       inputValue: "%",
-      handleClick: ()=>handlePercentageInput(),
+      handleClick: () => handlePercentageInput(),
     },
     {
       inputValue: "÷",
@@ -159,7 +187,7 @@ return    }
     },
     {
       inputValue: "x",
-      handleClick: () => handleOperationInput( "x"),
+      handleClick: () => handleOperationInput("x"),
       orange: true,
     },
     {
@@ -176,7 +204,7 @@ return    }
     },
     {
       inputValue: "-",
-      handleClick: () => handleOperationInput( "-"),
+      handleClick: () => handleOperationInput("-"),
       orange: true,
     },
     {

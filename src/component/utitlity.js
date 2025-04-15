@@ -6,8 +6,7 @@ export const operate = (numberOne, numberTwo, operation) => {
         "-": (one, two) => one.minus(two).toString(),
         "x": (one, two) => one.times(two).toString(),
         "÷": (one, two) => {
-            //If dividing or multiplying, then 1 maintains current value in cases of null
-            if (two === 0) {
+            if (Number(two) === 0) {
                 alert("Divide by 0 error");
                 return 0;
             }
