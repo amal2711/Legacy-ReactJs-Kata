@@ -2,29 +2,25 @@ import React from "react";
 import PropTypes from "prop-types";
 import "./Button.css";
 
-export default class Button extends React.Component {
-  static propTypes = {
-    name: PropTypes.string,
-    orange: PropTypes.bool,
-    wide: PropTypes.bool,
-    clickHandler: PropTypes.func,
-  };
+const Button = ({ name, orange, wide, onClick }) => {
+  const className = [
+    "component-button",
+    orange ? "orange" : "",
+    wide ? "wide" : "",
+  ].join(" ").trim();
 
-  handleClick = () => {
-    this.props.clickHandler(this.props.name);
-  };
+  return (
+    <div className={className}>
+      <button onClick={() => onClick(name)}>{name}</button>
+    </div>
+  );
+};
 
-  render() {
-    const className = [
-      "component-button",
-      this.props.orange ? "orange" : "",
-      this.props.wide ? "wide" : "",
-    ];
+Button.propTypes = {
+  name: PropTypes.string.isRequired,
+  orange: PropTypes.bool,
+  wide: PropTypes.bool,
+  onClick: PropTypes.func.isRequired,
+};
 
-    return (
-      <div className={className.join(" ").trim()}>
-        <button onClick={this.handleClick}>{this.props.name}</button>
-      </div>
-    );
-  }
-}
+export default Button;
