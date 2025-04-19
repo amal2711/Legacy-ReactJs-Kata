@@ -29,7 +29,7 @@ export const useCalculator = () => {
       calculatorState.next === "0"
         ? inputValue
         : calculatorState.next + inputValue;
-    updateState({ next: nextValue, total: null });
+    updateState(calculatorState.next?{ next: nextValue, total: null }:{ next: inputValue, total: null });
   };
 
   const handleNumberInput = useCallback(
