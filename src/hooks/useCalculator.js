@@ -6,7 +6,7 @@ const useCalculator = () => {
 
   const operate = (numberOne, numberTwo, operation) => {
     const one = Big(numberOne || "0");
-    const two = Big(numberTwo || (operation === "÷" || operation === "x" ? "1" : "0"));
+    const two = numberTwo !== null && numberTwo !== undefined ? Big(numberTwo) : Big("0");
 
     switch (operation) {
       case "+":
@@ -34,43 +34,45 @@ const useCalculator = () => {
     }
 
     if (isNumber(buttonName)) {
-      if (buttonName === "0" && next === "0") return {};
-      if (operation) return { next: next ? next + buttonName : buttonName };
-      return { next: next ? next + buttonName : buttonName, total: null };
+      if (buttonName === "0" && next === "0") return state;
+      if (operation) return { ...state, next: next ? next + buttonName : buttonName };
+      return { next: next ? next + buttonName : buttonName, total: null, operation: null };
     }
 
     if (buttonName === "%") {
-      if (operation && next) {
-        const result = operate(total, next, operation);
-        return { total: Big(result).div(Big("100")).toString(), next: null, operation: null };
+      if (next) {
+        return { ...state, next: Big(next).div(Big("100")).toString() };
       }
-      if (next) return { next: Big(next).div(Big("100")).toString() };
-      return {};
+      if (total) {
+        return { ...state, total: Big(total).div(Big("100")).toString() };
+      }
+      return state;
     }
 
     if (buttonName === ".") {
-      if (next?.includes(".")) return {};
-      return { next: next ? next + "." : "0." };
+      if (next?.includes(".")) return state;
+      return { ...state, next: next ? next + "." : "0." };
     }
 
     if (buttonName === "=") {
       if (next && operation) {
         return { total: operate(total, next, operation), next: null, operation: null };
       }
-      return {};
+      return state;
     }
 
     if (buttonName === "+/-") {
-      if (next) return { next: (-1 * parseFloat(next)).toString() };
-      if (total) return { total: (-1 * parseFloat(total)).toString() };
-      return {};
+      if (next) return { ...state, next: (-1 * parseFloat(next)).toString() };
+      if (total) return { ...state, total: (-1 * parseFloat(total)).toString() };
+      return state;
     }
 
     if (operation) {
+      if (!next) return { ...state, operation: buttonName };
       return { total: operate(total, next, operation), next: null, operation: buttonName };
     }
 
-    if (!next) return { operation: buttonName };
+    if (!next) return { ...state, operation: buttonName };
 
     return { total: next, next: null, operation: buttonName };
   }, []);
